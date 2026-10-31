@@ -2,7 +2,6 @@
 #include "DescriptorSetBuilder.h"
 #include "Debug.h"
 
-
 VulkanRenderer::VulkanRenderer(): /// Initialize all the variables
     window(nullptr), instance(nullptr), debugMessenger(0), surface(0),device(nullptr),
     windowWidth(0), windowHeight(0),presentQueue(0),graphicsQueue(nullptr), renderPass(0), swapChain(0),
@@ -55,7 +54,9 @@ bool VulkanRenderer::OnCreate(){
 
     ImGui_ImplVulkan_InitInfo initInfo{}; // imgui requires a single parameter of info
 
-    initInfo.ApiVersion = VK_API_VERSION_1_0;
+    static VkApplicationInfo appinfo;
+
+    initInfo.ApiVersion = appinfo.apiVersion;
     initInfo.Instance = instance;
     initInfo.PhysicalDevice = physicalDevice;
     initInfo.Device = device;
@@ -69,7 +70,7 @@ bool VulkanRenderer::OnCreate(){
     initInfo.PipelineInfoMain.RenderPass = renderPass;
     initInfo.PipelineInfoMain.Subpass = 0;
 
-    initInfo.UseDynamicRendering = false; // not using vulkan 1.3 so no dynmaic 
+    initInfo.UseDynamicRendering = false; // Not using vulkan 1.3 so no dynmaic 
 
     ImGui_ImplVulkan_Init(&initInfo);
 

@@ -86,10 +86,12 @@ void SceneManager::Run() {
 		ImGui_ImplSDL3_NewFrame();
 		ImGui::NewFrame();
 
-		ImGui::SetNextWindowSize(ImVec2(400, 100), ImGuiCond_FirstUseEver);
+		ImGui::Begin("Scene Statistics", nullptr, ImGuiChildFlags_AlwaysAutoResize);
+		
+		ImGui::SetNextWindowSize(ImVec2(400, 400), ImGuiCond_FirstUseEver);
 		ImGui::SetNextWindowPos(ImVec2(10, 10), ImGuiCond_FirstUseEver);
 
-		ImGui::Begin("Scene Timings",nullptr, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_AlwaysAutoResize);
+		ImGui::BeginChild("Scene Timings", ImVec2(0,60), ImGuiChildFlags_AutoResizeX | ImGuiChildFlags_Borders);
 		ImGui::SetWindowFontScale(1.5f);
 
 		float updateTime = profilerMain.GetElapsedTime("Update").count();
@@ -97,11 +99,9 @@ void SceneManager::Run() {
 
 		ImGui::TextColored(ColorForMs(updateTime), "Update: %.2fms", updateTime);
 		ImGui::TextColored(ColorForMs(renderTime), "Render: %.2fms", renderTime);
+		ImGui::EndChild();
 
 		profilerMain.reset();
-
-		ImGui::End();
-
 
 		{
 			ScopedTimer t(profilerMain, "Update");
@@ -111,7 +111,6 @@ void SceneManager::Run() {
 			ScopedTimer t(profilerMain, "Render");
 			currentScene->Render();
 		}
-
 
 		GetEvents();
 		

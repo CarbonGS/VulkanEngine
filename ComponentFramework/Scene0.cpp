@@ -19,8 +19,6 @@ Scene0::~Scene0() {
 
 bool Scene0::OnCreate() {
 
-	
-
 	int width = 0, height = 0;
 	float aspectRatio;
 
@@ -198,6 +196,15 @@ void Scene0::Render() const {
 			{
 				actor.second->Render(vRenderer);
 			}
+			
+			ImGui::SameLine();
+
+			ImGui::BeginChild("Scene Actor Count", ImVec2(0,0), ImGuiChildFlags_Borders | ImGuiChildFlags_AutoResizeX | ImGuiChildFlags_AutoResizeY);
+			ImGui::Text("Total Actors Loaded: %d", actors.size());
+			ImGui::SetWindowFontScale(1.5f);
+
+			ImGui::EndChild();
+			ImGui::End();
 
 			ImGui::Render();
 
