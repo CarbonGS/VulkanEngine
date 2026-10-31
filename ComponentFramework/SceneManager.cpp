@@ -76,10 +76,15 @@ static ImVec4 ColorForMs(float ms) {
 void SceneManager::Run() {
 	Profiler profilerMain;
 
+	float timeSinceLastReport = 0.0f;
+	unsigned int frameCount = 0;
+	float measuredFps = 0;
+
 	timer->Start();
 	isRunning = true;
 	while (isRunning) {
 		timer->UpdateFrameTicks();
+		frameCount++;
 
 		// imgui
 		ImGui_ImplVulkan_NewFrame();
@@ -90,6 +95,21 @@ void SceneManager::Run() {
 		
 		ImGui::SetNextWindowSize(ImVec2(400, 400), ImGuiCond_FirstUseEver);
 		ImGui::SetNextWindowPos(ImVec2(10, 10), ImGuiCond_FirstUseEver);
+
+		ImGui::BeginChild("FPS", ImVec2(100, 60), ImGuiChildFlags_AutoResizeX | ImGuiChildFlags_Borders);
+		ImGui::SetWindowFontScale(1.5f);
+
+		timeSinceLastReport += timer->GetDeltaTime();
+		if (timeSinceLastReport >= 1.0f) {
+			measuredFps = frameCount / timeSinceLastReport;
+			frameCount = 0;
+			timeSinceLastReport = 0.0f;		
+		}
+
+		ImGui::Text("FPS: %.0f", measuredFps);
+		ImGui::EndChild();
+
+		ImGui::SameLine();
 
 		ImGui::BeginChild("Scene Timings", ImVec2(0,60), ImGuiChildFlags_AutoResizeX | ImGuiChildFlags_Borders);
 		ImGui::SetWindowFontScale(1.5f);

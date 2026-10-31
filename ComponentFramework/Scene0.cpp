@@ -172,11 +172,11 @@ void Scene0::Update(const float deltaTime) {
 		actor.second->Update(deltaTime);
 	}
 
-	int profilerTest = 0;
+	/*int profilerTest = 0;
 	for (int i = 0; i < 10000000; ++i)
 	{
 		profilerTest = i;
-	}
+	}*/
 
 	Matrix4 marioMatrix = MMath::translate(0.0f, -1.0f, 0.0f) * MMath::rotate(elapsedTime * 90.0f, Vec3(0.0f, 1.0f, 0.0f)) * MMath::scale(0.5f, 0.5f, 0.5f);
 	mario->setModelMatrix(marioMatrix);
@@ -196,10 +196,9 @@ void Scene0::Render() const {
 			{
 				actor.second->Render(vRenderer);
 			}
-			
-			ImGui::SameLine();
+		
 
-			ImGui::BeginChild("Scene Actor Count", ImVec2(0,0), ImGuiChildFlags_Borders | ImGuiChildFlags_AutoResizeX | ImGuiChildFlags_AutoResizeY);
+			ImGui::BeginChild("Scene Actor Count", ImVec2(300,0), ImGuiChildFlags_Borders | ImGuiChildFlags_AutoResizeX | ImGuiChildFlags_AutoResizeY);
 			ImGui::Text("Total Actors Loaded: %d", actors.size());
 			ImGui::SetWindowFontScale(1.5f);
 

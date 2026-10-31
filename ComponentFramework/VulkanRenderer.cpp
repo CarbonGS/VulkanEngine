@@ -74,7 +74,6 @@ bool VulkanRenderer::OnCreate(){
 
     ImGui_ImplVulkan_Init(&initInfo);
 
-    
     return true;
 }
 
