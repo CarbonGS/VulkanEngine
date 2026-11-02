@@ -15,8 +15,9 @@ union SDL_Event;
 
 class Scene0 : public Scene {
 private:
-	
+	Audio& audioSystem;
 	Renderer *renderer;
+
 	Camera *camera;
 
 	ObjectPool<Actor> actorPool;
@@ -37,7 +38,7 @@ private:
 
 public:
 
-	explicit Scene0(Renderer* renderer_);
+	explicit Scene0(Renderer* renderer_, Audio& audioSystem_);
 	virtual ~Scene0();
 
 	virtual bool OnCreate() override;

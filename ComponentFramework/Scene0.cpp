@@ -9,8 +9,10 @@
 
 
 
-Scene0::Scene0(Renderer *renderer_):
-	Scene(nullptr),renderer(renderer_), camera(nullptr), actorPool(5) {
+Scene0::Scene0(Renderer *renderer_, Audio& audioSystem_):
+	Scene(renderer_, audioSystem_),renderer(renderer_), 
+	camera(nullptr), actorPool(5), audioSystem(audioSystem_)
+{
 	Debug::Info("Created Scene0: ", __FILE__, __LINE__);
 }
 

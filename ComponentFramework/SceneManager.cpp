@@ -59,7 +59,7 @@ bool SceneManager::Initialize(std::string name_, int width_, int height_) {
 		Debug::FatalError("Failed to initialize Timer object", __FILE__, __LINE__);
 		return false;
 	}
-	
+
 	BuildScene(SCENE0);
 	
 	return true;

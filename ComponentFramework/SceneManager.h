@@ -3,6 +3,8 @@
 
 #include <string>
 #include "Renderer.h"
+#include "Audio.h"
+
 class SceneManager  {\
 public:
 	
@@ -29,6 +31,7 @@ private:
 	class Scene* currentScene;
 	class Timer* timer;
 
+	Audio audioSystem;
 	Renderer* renderer;
 	unsigned int fps;
 	bool isRunning;

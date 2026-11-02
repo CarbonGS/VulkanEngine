@@ -111,6 +111,9 @@
     <ClCompile Include="imgui_widgets.cpp">
       <Filter>external\imgui\src</Filter>
     </ClCompile>
+    <ClCompile Include="Audio.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Debug.h">
@@ -184,6 +187,9 @@
     </ClInclude>
     <ClInclude Include="imstb_truetype.h">
       <Filter>external\imgui\headers</Filter>
+    </ClInclude>
+    <ClInclude Include="Audio.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
