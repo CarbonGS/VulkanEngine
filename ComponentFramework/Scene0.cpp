@@ -169,7 +169,7 @@ void Scene0::Update(const float deltaTime) {
 	//luigisModelMatrix = MMath::translate(2.0f, 0.0f, 0.0f) * MMath::rotate(elapsedTime * 90.0f, Vec3(1.0f, 0.0f, 0.0f));
 
 	// Update all actors
-	for (auto actor : actors)
+	for (auto& actor : actors)
 	{
 		actor.second->Update(deltaTime);
 	}
@@ -194,7 +194,7 @@ void Scene0::Render() const {
 			vRenderer->RecordCommandBuffers(Recording::START);
 
 			// Render all actors
-			for (auto actor : actors)
+			for (auto& actor : actors)
 			{
 				actor.second->Render(vRenderer);
 			}
@@ -239,7 +239,7 @@ void Scene0::OnDestroy() {
 		size_t acquired = actorPool.FreeCount(); // Get pre release free space in pool (ie how many objects we used - pool size)
 
 		// Destroy all actors
-		for (auto actor : actors)
+		for (auto& actor : actors)
 		{
 			actor.second->OnDestroy(vRenderer);
 			actorPool.Release(actor.second);			
