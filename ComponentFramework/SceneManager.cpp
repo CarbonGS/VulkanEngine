@@ -204,7 +204,7 @@ void SceneManager::BuildScene(SCENE_NUMBER scene) {
 
 	switch (scene) {
 	case SCENE0:  
-		currentScene = new Scene0(renderer);
+		currentScene = new Scene0(renderer, audioSystem);
 		status = currentScene->OnCreate();
 		break;
 

@@ -54,7 +54,7 @@ inline ObjectPool<T>::ObjectPool(size_t capacity_)
 template<typename T>
 inline ObjectPool<T>::~ObjectPool()
 {
-	assert(FreeCount() == capacity); // Ensure pool is emptied
+	assert(FreeCount() == capacity); // Ensure pool is emptied (If hit then memory leak)
 
 	operator delete(block, std::align_val_t(alignof(T))); // Assign whole block raw memory - ie delete block
 }

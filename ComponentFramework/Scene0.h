@@ -22,7 +22,8 @@ private:
 
 	ObjectPool<Actor> actorPool;
 
-	std::unordered_map<std::string, Actor*> actors;
+	std::unordered_map<std::string, Actor*> actorsLookup;
+	std::vector<Actor*> actorLoop;
 
 	Actor* brz;
 	Actor* mario;

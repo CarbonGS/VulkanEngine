@@ -73,7 +73,7 @@
     <IncludePath>C:\GameDev\OpenGL\include;C:\GameDev\SDL3\include;C:\GameDev\Vulkan\include;C:\GameDev\MathLibrary\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>$(ProjectDir)FMODfsbank\inc;$(ProjectDir)FMOD\studio\inc;$(ProjectDir)FMOD\core\inc;C:\GameDev\SDL3\include;C:\GameDev\MathLibrary\include;C:\GameDev\Vulkan\include;C:\GameDev\OpenGL\include;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)\ComponentFramework\FMOD\studio\inc;$(SolutionDir)\ComponentFramework\FMOD\fsbank\inc;$(SolutionDir)\ComponentFramework\FMOD\core\inc;C:\GameDev\SDL3\include;C:\GameDev\MathLibrary\include;C:\GameDev\Vulkan\include;C:\GameDev\OpenGL\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -98,8 +98,8 @@
       <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
-      <AdditionalLibraryDirectories>$(ProjectDir)FMOD\studio\lib\x64;$(ProjectDir)FMOD\fsbank\lib\x64;$(ProjectDir)FMOD\core\lib\x64;C:\GameDev\OpenGL\lib\x64;C:\GameDev\SDL3\lib\x64;C:\GameDev\Vulkan\lib64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>SDL3.lib;SDL3_image.lib;glew32.lib;glew32s.lib;opengl32.lib;vulkan-1.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)\ComponentFramework\FMOD\core\lib\x64;$(SolutionDir)\ComponentFramework\FMOD\fsbank\lib\x64;$(SolutionDir)\ComponentFramework\FMOD\studio\lib\x64;C:\GameDev\OpenGL\lib\x64;C:\GameDev\SDL3\lib\x64;C:\GameDev\Vulkan\lib64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>fmodstudio_vc.lib;fsbank_vc.lib;fmod_vc.lib;SDL3.lib;SDL3_image.lib;glew32.lib;glew32s.lib;opengl32.lib;vulkan-1.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">

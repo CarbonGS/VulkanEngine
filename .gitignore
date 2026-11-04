@@ -98,6 +98,9 @@ StyleCopReport.xml
 *.svclog
 *.scc
 
+# EXCEPT allow obj from meshes folder
+!/meshes/**/*.obj
+
 # Chutzpah Test files
 _Chutzpah*
 

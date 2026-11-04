@@ -80,7 +80,8 @@ bool Scene0::OnCreate() {
 		
 		mario->OnCreate(Vec3(0, 0, 0), Vec3(0, 0, 0), orient, marioDescSetInfo, marioPipelineInfo);
 
-		actors["mario"] = mario;
+		actorsLookup["mario"] = mario;
+		actorLoop.push_back(mario);
 
 		// BRZ actor creation
 		brz = actorPool.Acquire();
@@ -98,7 +99,8 @@ bool Scene0::OnCreate() {
 
 		brz->OnCreate(Vec3(0, 0, 0), Vec3(0, 0, 0), orient, brzDescSetInfo, brzPipelineInfo);
 
-		actors["brz"] = brz;	
+		actorsLookup["brz"] = brz;
+		actorLoop.push_back(brz);
 	
 	}
 		break;
@@ -169,9 +171,9 @@ void Scene0::Update(const float deltaTime) {
 	//luigisModelMatrix = MMath::translate(2.0f, 0.0f, 0.0f) * MMath::rotate(elapsedTime * 90.0f, Vec3(1.0f, 0.0f, 0.0f));
 
 	// Update all actors
-	for (auto& actor : actors)
+	for (auto& actor : actorLoop)
 	{
-		actor.second->Update(deltaTime);
+		actor->Update(deltaTime);
 	}
 
 	/*int profilerTest = 0;
@@ -194,14 +196,14 @@ void Scene0::Render() const {
 			vRenderer->RecordCommandBuffers(Recording::START);
 
 			// Render all actors
-			for (auto& actor : actors)
+			for (auto& actor : actorLoop)
 			{
-				actor.second->Render(vRenderer);
+				actor->Render(vRenderer);
 			}
 		
 
 			ImGui::BeginChild("Scene Actor Count", ImVec2(300,0), ImGuiChildFlags_Borders | ImGuiChildFlags_AutoResizeX | ImGuiChildFlags_AutoResizeY);
-			ImGui::Text("Total Actors Loaded: %d", actors.size());
+			ImGui::Text("Total Actors Loaded: %d", actorLoop.size());
 			ImGui::SetWindowFontScale(1.5f);
 
 			ImGui::EndChild();
@@ -239,17 +241,18 @@ void Scene0::OnDestroy() {
 		size_t acquired = actorPool.FreeCount(); // Get pre release free space in pool (ie how many objects we used - pool size)
 
 		// Destroy all actors
-		for (auto& actor : actors)
+		for (auto& actor : actorLoop)
 		{
-			actor.second->OnDestroy(vRenderer);
-			actorPool.Release(actor.second);			
+			actor->OnDestroy(vRenderer);
+			actorPool.Release(actor);			
 		}
+		actorLoop.clear();
+		actorsLookup.clear();
 
 		size_t released = actorPool.FreeCount(); // Get post release free space in pool (ideally pool size)
 
 		std::cout << "Released: " << released - acquired << " actors\n"; // Subtract released (pool size) from acquired (objects used - pool size) to get total count
 
-		actors.clear();
 		vRenderer->DestroyUBO(lightsUBO);
 
 		if (camera) {
