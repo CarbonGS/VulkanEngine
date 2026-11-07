@@ -11,13 +11,14 @@ VulkanRenderer::VulkanRenderer(): /// Initialize all the variables
  }
 
 VulkanRenderer::~VulkanRenderer() {
-
+    SDL_QuitSubSystem(SDL_INIT_GAMEPAD);
+    SDL_Quit();
 }
 
 SDL_Window* VulkanRenderer::CreateWindow(std::string name_, int width_, int height_) {
     windowWidth = width_;
     windowHeight = height_;
-    if(SDL_Init(SDL_INIT_VIDEO) == false){
+    if(SDL_Init(SDL_INIT_VIDEO | SDL_INIT_GAMEPAD) == false){ // Init gamepad
         Debug::FatalError(SDL_GetError(), __FILE__, __LINE__);
         throw std::runtime_error("failed to INIT SDL");
     }
