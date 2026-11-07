@@ -9,45 +9,118 @@ Audio::Audio()
 
 Audio::~Audio()
 {
-	for (auto& sound : soundMap)
+	auto map = &internal.loadedSounds;
+
+	for (auto& [name, sound] : internal.loadedSounds)
 	{
-		sound.second->release(); // Release all sounds currently mapped
+		sound->release(); // Release all sounds currently mapped
 	}
-	soundMap.clear();
+	for (auto& [name, channel] : internal.activeChannels)
+	{
+		channel->stop(); // Stop all channels
+	}
+
+	internal.loadedSounds.clear();
+	internal.activeChannels.clear();
 
 	fmodSystem->close();
 	fmodSystem->release();
 }
 
 
-bool Audio::loadSoundFromFile(const std::string soundName, const char* soundFile, FMOD_MODE mode, FMOD_CREATESOUNDEXINFO* soundInfo)
+bool Audio::loadSoundFromFile(const std::string soundName, const char* soundFilePath, FMOD_MODE mode, FMOD_CREATESOUNDEXINFO* soundInfo)
 {
-	soundMap[soundName]; // Add sound to map (default nullptr)
+	FMOD_RESULT result = fmodSystem->createSound(soundFilePath, mode, soundInfo, &internal.loadedSounds[soundName]);
 
-	if (fmodSystem->createSound(soundFile, mode, soundInfo, &soundMap[soundName])) return true; // Created sound
+	if (result == FMOD_OK)
+	{
+		std::cout << "Loaded sound: " << soundName << std::endl;
+		return true; // Created sound
+	}
 
-	std::cout << "Failed to create sound: " << soundName << std::endl;
-	return false; // Return fail if sound was not made
+	internal.loadedSounds.erase(soundName);
+
+	std::cout << "Failed to load sound: " << soundName << " FMOD ERROR: " << FMOD_ErrorString(result) << std::endl;
+
+	return false; // Sound not created
 }
 
 bool Audio::playSound(const std::string soundName, bool paused)
 {
 
-	FMOD::Sound* sound = soundMap.find(soundName)->second;
+	auto it = internal.loadedSounds.find(soundName);
 
-	// If sound is not nullptr
-	if (sound)
+	if (it == internal.loadedSounds.end())
 	{
-		FMOD::Channel* channel;
-
-		if (fmodSystem->playSound(sound, nullptr, paused, &channel)) return true; // Returns true if sound was played
-
-		std::cout << "Sound found but could not be played, name: " << soundName << std::endl;
+		std::cout << "Sound not found: " << soundName << std::endl;
 		return false;
 	}
 
-	return false; // Sound not found (most likely spelling error)
+	FMOD::Channel* channel = nullptr;
+
+	FMOD_RESULT result = fmodSystem->playSound(it->second, nullptr, paused, &channel);
+
+	internal.activeChannels[soundName] = channel; // store active channel
+
+	if (result == FMOD_OK) 
+		return true; // Returns true if sound was played
+
+	std::cout << "Sound not played: " << soundName << " FMOD ERROR: " << FMOD_ErrorString(result) << std::endl;
+	return false; // Sound failed to play
 }
+
+bool Audio::stopSound(const std::string soundName)
+{
+	auto it = internal.activeChannels.find(soundName);
+
+	if (it == internal.activeChannels.end()) // 
+	{
+		std::cout << "Could not stop sound: " << soundName << std::endl;
+		return false;
+	}
+
+	it->second->stop(); // stop playing audio
+	auto channelData = internal.activeChannels.find(soundName); // Get our sound that occupied said channel
+	internal.activeChannels.erase(channelData); // Remove channel from active channels
+
+	return true; // Succesfully stopped sound
+}
+
+bool Audio::isSoundPlaying(const std::string soundName)
+{
+	auto it = internal.activeChannels.find(soundName); // Get active channel of soundName
+
+	if (it == internal.activeChannels.end()) // Failed to find sound with active channel
+	{
+		return false;
+	}
+
+	bool result = false;
+
+	it->second->isPlaying(&result); // Record result of channel that target sound is playing
+
+	if (!result) // Sound is not playing
+	{
+		return false;
+	}
+	
+	return true;
+}
+
+void Audio::Update()
+{
+	for (auto& channel : internal.activeChannels)
+	{
+		if (channel.second != nullptr) {
+			if (!isSoundPlaying(channel.first)) // Checks if channel is currently inactive
+			{
+				stopSound(channel.first); // Clears inactive channels
+			}
+		}
+	}
+}
+
+
 
 
 

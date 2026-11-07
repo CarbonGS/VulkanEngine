@@ -24,10 +24,10 @@ bool Scene0::OnCreate() {
 	int width = 0, height = 0;
 	float aspectRatio;
 
-	switch (renderer->getRendererType()){
+	switch (renderer->getRendererType()) {
 	case RendererType::VULKAN:
 	{
-		
+
 		VulkanRenderer* vRenderer;
 		vRenderer = dynamic_cast<VulkanRenderer*>(renderer);
 
@@ -73,11 +73,11 @@ bool Scene0::OnCreate() {
 		DescriptorSetBuilder marioDescriptorSetBuilder(vRenderer->getDevice());
 		marioDescriptorSetBuilder.add(0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT, 1, camera->getCameraUBO());
 		marioDescriptorSetBuilder.add(1, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
-		VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 1, lightsUBO);
+			VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 1, lightsUBO);
 		marioDescriptorSetBuilder.add(2, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT, 1, &mario->GetSampler());
 		DescriptorSetInfo marioDescSetInfo = marioDescriptorSetBuilder.BuildDescriptorSet(vRenderer->getNumSwapchains());
 		PipelineInfo marioPipelineInfo = vRenderer->CreateGraphicsPipeline(marioDescSetInfo.descriptorSetLayout, "shaders/multiPhong.vert.spv", "shaders/multiPhong.frag.spv");
-		
+
 		mario->OnCreate(Vec3(0, 0, 0), Vec3(0, 0, 0), orient, marioDescSetInfo, marioPipelineInfo);
 
 		actorsLookup["mario"] = mario;
@@ -92,7 +92,7 @@ bool Scene0::OnCreate() {
 		DescriptorSetBuilder brzDescriptorSetBuilder(vRenderer->getDevice());
 		brzDescriptorSetBuilder.add(0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT, 1, camera->getCameraUBO());
 		brzDescriptorSetBuilder.add(1, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
-		VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 1, lightsUBO);
+			VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 1, lightsUBO);
 		brzDescriptorSetBuilder.add(2, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT, 1, &brz->GetSampler());
 		DescriptorSetInfo brzDescSetInfo = brzDescriptorSetBuilder.BuildDescriptorSet(vRenderer->getNumSwapchains());
 		PipelineInfo brzPipelineInfo = vRenderer->CreateGraphicsPipeline(brzDescSetInfo.descriptorSetLayout, "shaders/multiPhong.vert.spv", "shaders/multiPhong.frag.spv");
@@ -101,14 +101,18 @@ bool Scene0::OnCreate() {
 
 		actorsLookup["brz"] = brz;
 		actorLoop.push_back(brz);
-	
-	}
-		break;
 
+		// Load mp3
+		audioSystem.loadSoundFromFile("mp3File", "./AudioFiles/soundtrack1.mp3", FMOD_DEFAULT, nullptr);
+		// Load flac
+		audioSystem.loadSoundFromFile("flacFile", "./AudioFiles/soundtrack2.flac", FMOD_DEFAULT, nullptr);
+		// Load m4a (should not support)
+		audioSystem.loadSoundFromFile("m4a", "./AudioFiles/soundtrack3.m4a", FMOD_DEFAULT, nullptr);
+		break;
+	}
 	case RendererType::OPENGL:
 		break;
 	}
-
 	return true;
 }
 
@@ -155,6 +159,42 @@ void Scene0::HandleEvents(const SDL_Event& sdlEvent) {
 				}
 
 			}
+
+			switch (sdlEvent.key.key)
+			{
+			case SDLK_F:
+				if (!audioSystem.isSoundPlaying("flacFile"))
+				{
+					audioSystem.playSound("flacFile", false);
+				}
+				else {
+					audioSystem.stopSound("flacFile");
+				}
+				break;
+			case SDLK_M:
+				if (!audioSystem.isSoundPlaying("mp3File"))
+				{
+					audioSystem.playSound("mp3File", false);
+				}
+				else
+				{
+					audioSystem.stopSound("mp3File");
+				}
+				break;
+			case SDLK_4:
+				if (!audioSystem.isSoundPlaying("m4aFile"))
+				{
+					audioSystem.playSound("m4aFile", false);
+				}
+				else
+				{
+					audioSystem.stopSound("m4aFile");
+				}
+				break;
+			default:
+				break;
+			}
+
 			dynamic_cast<VulkanRenderer*>(renderer)->UpdateUniformBuffer<LightsData>(lights, lightsUBO); // updates buffer to apply changes
 			break;
 		default:
@@ -166,8 +206,12 @@ void Scene0::HandleEvents(const SDL_Event& sdlEvent) {
 }
 
 void Scene0::Update(const float deltaTime) {
+
+	audioSystem.Update();
+
 	static float elapsedTime = 0.0f;
 	elapsedTime += deltaTime;
+
 	//luigisModelMatrix = MMath::translate(2.0f, 0.0f, 0.0f) * MMath::rotate(elapsedTime * 90.0f, Vec3(1.0f, 0.0f, 0.0f));
 
 	// Update all actors

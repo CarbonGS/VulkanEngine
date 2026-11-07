@@ -16,6 +16,7 @@ union SDL_Event;
 class Scene0 : public Scene {
 private:
 	Audio& audioSystem;
+
 	Renderer *renderer;
 
 	Camera *camera;
