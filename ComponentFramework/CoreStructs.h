@@ -57,6 +57,7 @@ struct ModelMatrixPushConst {
     Matrix4 modelMatrix;
     Vec4 normalMatrix[3];
     Vec4 pad;/// padding for right now
+    uint32_t highlight = 0;
 };
 
 

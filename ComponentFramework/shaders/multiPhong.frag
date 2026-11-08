@@ -5,6 +5,7 @@ layout (location = 0) in vec3 vertNormal;
 layout (location = 1) in vec3 eyeDir;
 layout (location = 2) in vec2 fragTexCoords;
 layout (location = 3) in vec3 lightDir[MAX_LIGHTS];
+layout (location = 7) flat in uint highlighted;
 
 
 layout(binding = 1) uniform LightsUBO {
@@ -24,6 +25,12 @@ void main() {
 	float spec[MAX_LIGHTS];
 	float diff[MAX_LIGHTS];
 	vec4 ka = lights.ambient;
+
+	if (highlighted != 0)
+	{
+		ka *= 10;
+	}
+
 	vec4 kt = texture(texSampler,fragTexCoords); 
 	vec4 phongResult = vec4(0.0,0.0,0.0,0.0);
 

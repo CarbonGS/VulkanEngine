@@ -150,7 +150,7 @@ PipelineInfo VulkanRenderer::CreateGraphicsPipeline(VkDescriptorSetLayout descri
     colorBlending.blendConstants[3] = 0.0f;
 
     VkPushConstantRange range{};
-    range.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
+    range.stageFlags = VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT;
     range.offset = 0;
     range.size = sizeof(ModelMatrixPushConst);
 

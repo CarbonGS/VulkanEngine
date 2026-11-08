@@ -19,6 +19,8 @@ private:
 	DescriptorSetInfo descSetInfo;
 	PipelineInfo pipelineInfo;
 
+	bool highlighted = false;
+
 public:
 
 	Actor();
@@ -37,12 +39,16 @@ public:
 
 	// Setters
 	void setModelMatrix(Matrix4 matrix_);
+	void setHighlighState(const bool state);
 
 	// Getters
-	Quaternion GetOriention() const;
-	PipelineInfo GetPipeline();
+	// Non modifiable (or at least shouldn't be)
+	const Quaternion GetOriention() const;
+	const PipelineInfo GetPipeline() const;
+	const IndexedVertexBuffer& GetMesh() const;
+
+	// Modifiable
 	DescriptorSetInfo& GetDesc();
 	Sampler2D& GetSampler();
-	IndexedVertexBuffer& GetMesh();
 };
 

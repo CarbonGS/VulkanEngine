@@ -34,10 +34,11 @@ void Actor::Update(const float dt)
 
 void Actor::Render(VulkanRenderer* renderer) const
 {
+
 	renderer->BindMesh(mesh);
 	renderer->BindDescriptorSet(pipelineInfo.pipelineLayout, descSetInfo.descriptorSet);
 	renderer->BindPipeline(pipelineInfo.pipeline);
-	renderer->SetPushConstant(pipelineInfo, modelMatrix);
+	renderer->SetPushConstant(pipelineInfo, modelMatrix, highlighted);
 	renderer->DrawIndexed(mesh);
 }
 
@@ -68,12 +69,17 @@ void Actor::setModelMatrix(Matrix4 matrix_)
 	modelMatrix = matrix_;
 }
 
-Quaternion Actor::GetOriention() const
+void Actor::setHighlighState(const bool state)
+{
+	highlighted = state;
+}
+
+const Quaternion Actor::GetOriention() const
 {
 	return orient;
 }
 
-PipelineInfo Actor::GetPipeline()
+const PipelineInfo Actor::GetPipeline() const
 {
 	return pipelineInfo;
 }
@@ -88,7 +94,7 @@ Sampler2D& Actor::GetSampler()
 	return texture;
 }
 
-IndexedVertexBuffer& Actor::GetMesh()
+const IndexedVertexBuffer& Actor::GetMesh() const
 {
 	return mesh;
 }

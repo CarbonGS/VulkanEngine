@@ -15,12 +15,14 @@ union SDL_Event;
 
 class Scene0 : public Scene {
 private:
+	// Systems
 	Audio& audioSystem;
-
 	Renderer *renderer;
 
+	// Camera
 	Camera *camera;
 
+	// Actors
 	ObjectPool<Actor> actorPool;
 
 	std::unordered_map<std::string, Actor*> actorsLookup;
@@ -29,6 +31,12 @@ private:
 	Actor* brz;
 	Actor* mario;
 
+	int selectedActor;
+
+	// Gamepad
+	SDL_Gamepad* gamepad;
+
+	// Lights
 	std::vector<BufferMemory> lightsUBO;
 	LightsData lights;
 

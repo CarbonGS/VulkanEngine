@@ -941,8 +941,9 @@ void VulkanRenderer::BindDescriptorSet(VkPipelineLayout pipelineLayout, std::vec
     }
 }
 
-void VulkanRenderer::SetPushConstant(const PipelineInfo pipelineInfo, const Matrix4& modelMatrix_) {
+void VulkanRenderer::SetPushConstant(const PipelineInfo pipelineInfo, const Matrix4& modelMatrix_, const uint32_t highlight_) {
     ModelMatrixPushConst modelMatrixPushConst;
+    modelMatrixPushConst.highlight = highlight_;
     modelMatrixPushConst.modelMatrix = modelMatrix_;
     Matrix3 normalMatrix = Matrix3(MMath::transpose(MMath::inverse(modelMatrix_)));
 
@@ -961,7 +962,7 @@ void VulkanRenderer::SetPushConstant(const PipelineInfo pipelineInfo, const Matr
 
     for (uint32_t i = 0; i < getNumSwapchains(); i++) {
         vkCmdPushConstants(primaryCommandBuffer.commandBuffers[i], pipelineInfo.pipelineLayout,
-            VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(ModelMatrixPushConst), &modelMatrixPushConst);
+            VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0, sizeof(ModelMatrixPushConst), &modelMatrixPushConst);
     }
 }
 

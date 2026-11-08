@@ -120,6 +120,7 @@ void Scene0::HandleEvents(const SDL_Event& sdlEvent) {
 	
 	float aspectRatio = static_cast<float>(sdlEvent.window.data1) / static_cast<float>(sdlEvent.window.data2);
 	static int colorState = 0;
+	static bool highlightState = false;
 
 		switch (sdlEvent.type) {
 		case SDL_EVENT_WINDOW_PIXEL_SIZE_CHANGED:
@@ -129,10 +130,13 @@ void Scene0::HandleEvents(const SDL_Event& sdlEvent) {
 				dynamic_cast<VulkanRenderer*>(renderer)->RecreateSwapChain();
 			}
 			break;
-		case SDL_EVENT_KEY_UP:
 
-			if (sdlEvent.key.key == SDLK_1)
+		// Keyboard
+		case SDL_EVENT_KEY_UP:
+			
+			switch (sdlEvent.key.key)
 			{
+			case SDLK_1:
 				// Set all lights to off
 				for (uint32_t i = 0; i < lights.numLights; ++i)
 				{
@@ -157,11 +161,8 @@ void Scene0::HandleEvents(const SDL_Event& sdlEvent) {
 				case 0:
 					break;
 				}
+				dynamic_cast<VulkanRenderer*>(renderer)->UpdateUniformBuffer<LightsData>(lights, lightsUBO); // updates buffer to apply changes
 
-			}
-
-			switch (sdlEvent.key.key)
-			{
 			case SDLK_F:
 				if (!audioSystem.isSoundPlaying("flacFile"))
 				{
@@ -191,18 +192,34 @@ void Scene0::HandleEvents(const SDL_Event& sdlEvent) {
 					audioSystem.stopSound("m4aFile");
 				}
 				break;
+			case SDLK_5:
+				highlightState ? highlightState = false : highlightState = true;
+				actorLoop[selectedActor]->setHighlighState(highlightState);
+				break;
+			case SDLK_6:
+				selectedActor = (selectedActor + 1) % actorLoop.size();
+				break;
 			default:
 				break;
 			}
 
-			dynamic_cast<VulkanRenderer*>(renderer)->UpdateUniformBuffer<LightsData>(lights, lightsUBO); // updates buffer to apply changes
-			break;
+			// Gamepad
+			switch (sdlEvent.gbutton.down)
+			{
+			case SDL_GAMEPAD_BUTTON_DPAD_RIGHT:
+				
+				break;
+			default:
+				break;
+			}
+
 		default:
 			if (renderer->getRendererType() == RendererType::VULKAN) {
 				dynamic_cast<VulkanRenderer*>(renderer)->RecreateSwapChain();
 			}
 			break;
 		}	
+		
 }
 
 void Scene0::Update(const float deltaTime) {
@@ -245,7 +262,6 @@ void Scene0::Render() const {
 				actor->Render(vRenderer);
 			}
 		
-
 			ImGui::BeginChild("Scene Actor Count", ImVec2(300,0), ImGuiChildFlags_Borders | ImGuiChildFlags_AutoResizeX | ImGuiChildFlags_AutoResizeY);
 			ImGui::Text("Total Actors Loaded: %d", actorLoop.size());
 			ImGui::SetWindowFontScale(1.5f);

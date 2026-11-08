@@ -187,7 +187,7 @@ public:
     void CreateCommandBuffers();
     void DestroyCommandBuffers();
     void RecordCommandBuffers(Recording start_stop);
-    void SetPushConstant(const PipelineInfo pipelineInfo, const Matrix4& modelMatrix_);
+    void SetPushConstant(const PipelineInfo pipelineInfo, const Matrix4& modelMatrix_, const uint32_t highlight);
     
     /// Some inlined getter and setters 
     SDL_Window* getWindow() { return window; }

@@ -15,6 +15,7 @@ layout(push_constant) uniform Push {
 	mat4 modelMatrix;
 	mat3x4 normalMatrix; 
 	vec4 pad;
+	uint highlighted;
 } push;
 
 layout(binding = 1) uniform LightsUBO {
@@ -29,11 +30,13 @@ layout (location = 0) out vec3 vertNormal;
 layout (location = 1) out vec3 eyeDir;
 layout (location = 2) out vec2 fragTexCoords;
 layout (location = 3) out vec3 lightDir[MAX_LIGHTS];
+layout (location = 7) out flat uint highlighted;
 
 
 void main() {
 	fragTexCoords = texCoords;
 	mat3 normalMatrix = transpose(mat3(push.normalMatrix));
+	highlighted = push.highlighted;
 
 	vertNormal = normalize(normalMatrix * vNormal.xyz); /// Rotate the normal to the correct orientation 
 	vec3 vertPos = vec3(camera.viewMatrix * push.modelMatrix * vVertex); /// This is the position of the vertex from the origin
