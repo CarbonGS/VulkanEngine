@@ -35,6 +35,8 @@ private:
 
 	// Gamepad
 	SDL_Gamepad* gamepad;
+	int stickLX, stickRX, stickLY, stickRY;
+	const int deadzone = 2000;
 
 	// Lights
 	std::vector<BufferMemory> lightsUBO;

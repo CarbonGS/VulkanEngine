@@ -3,15 +3,16 @@
 Actor::Actor()
 {}
 
-void Actor::OnCreate(Vec3 pos_, Vec3 vel_, Quaternion orient_, DescriptorSetInfo descSetInfo_, PipelineInfo pipelineInfo_)
+void Actor::OnCreate(Vec3 pos_, Vec3 vel_, Quaternion orient_, DescriptorSetInfo descSetInfo_, PipelineInfo pipelineInfo_, Vec3 scale_)
 {
 	// Initialize physics base values
 	pos = pos_;
 	vel = vel_;
 	orient = orient_;
+	scale = scale_;
 
 	// Set model data
-	modelMatrix = MMath::translate(pos_) * MMath::toMatrix4(orient_);
+	modelMatrix = MMath::translate(pos_) * MMath::toMatrix4(orient_) * MMath::scale(scale_.x, scale_.y, scale_.z);
 
 	// Assign descriptor set
 	descSetInfo = descSetInfo_;
@@ -29,7 +30,7 @@ void Actor::OnDestroy(VulkanRenderer* renderer)
 
 void Actor::Update(const float dt)
 {
-	modelMatrix = MMath::translate(pos) * MMath::toMatrix4(orient) * MMath::scale(1.0f, 1.0f, 1.0f);
+	modelMatrix = MMath::translate(pos) * MMath::toMatrix4(orient) * MMath::scale(scale.x, scale.y, scale.z);
 }
 
 void Actor::Render(VulkanRenderer* renderer) const
@@ -72,6 +73,16 @@ void Actor::setModelMatrix(Matrix4 matrix_)
 void Actor::setHighlighState(const bool state)
 {
 	highlighted = state;
+}
+
+void Actor::rotate(const Quaternion& deltaOrient)
+{
+	orient = QMath::normalize(deltaOrient * orient);
+}
+
+void Actor::translate(const Vec3& delta)
+{
+	pos += delta;
 }
 
 const Quaternion Actor::GetOriention() const

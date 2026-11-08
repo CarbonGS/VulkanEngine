@@ -1,5 +1,6 @@
 #include <glew.h>
 #include <iostream>
+#include <cstdlib>
 #include "Debug.h"
 #include "Scene0.h"
 #include <MMath.h>
@@ -10,8 +11,9 @@
 
 
 Scene0::Scene0(Renderer *renderer_, Audio& audioSystem_):
-	Scene(renderer_, audioSystem_),renderer(renderer_), 
-	camera(nullptr), actorPool(5), audioSystem(audioSystem_)
+	Scene(renderer_, audioSystem_),renderer(renderer_),
+	camera(nullptr), actorPool(5), audioSystem(audioSystem_),
+	selectedActor(0), stickLX(0), stickRX(0), stickLY(0), stickRY(0)
 {
 	Debug::Info("Created Scene0: ", __FILE__, __LINE__);
 }
@@ -78,7 +80,7 @@ bool Scene0::OnCreate() {
 		DescriptorSetInfo marioDescSetInfo = marioDescriptorSetBuilder.BuildDescriptorSet(vRenderer->getNumSwapchains());
 		PipelineInfo marioPipelineInfo = vRenderer->CreateGraphicsPipeline(marioDescSetInfo.descriptorSetLayout, "shaders/multiPhong.vert.spv", "shaders/multiPhong.frag.spv");
 
-		mario->OnCreate(Vec3(0, 0, 0), Vec3(0, 0, 0), orient, marioDescSetInfo, marioPipelineInfo);
+		mario->OnCreate(Vec3(0.0f, -1.0f, 0.0f), Vec3(0, 0, 0), orient, marioDescSetInfo, marioPipelineInfo, Vec3(0.5f, 0.5f, 0.5f));
 
 		actorsLookup["mario"] = mario;
 		actorLoop.push_back(mario);
@@ -216,7 +218,7 @@ void Scene0::HandleEvents(const SDL_Event& sdlEvent) {
 			}
 			break;
 
-		// Gamepad
+		// Gamepad buttons
 		case SDL_EVENT_GAMEPAD_BUTTON_DOWN:
 			switch (sdlEvent.gbutton.button)
 			{
@@ -242,24 +244,65 @@ void Scene0::HandleEvents(const SDL_Event& sdlEvent) {
 				break;
 			}
 			break;
+		// Gamepad joysticks
+		case SDL_EVENT_GAMEPAD_AXIS_MOTION:
 
-		default:
-			if (renderer->getRendererType() == RendererType::VULKAN) {
-				dynamic_cast<VulkanRenderer*>(renderer)->RecreateSwapChain();
+			switch (sdlEvent.gaxis.axis) {
+			case SDL_GAMEPAD_AXIS_LEFTX:
+				stickLX = sdlEvent.gaxis.value;
+				break;
+			case SDL_GAMEPAD_AXIS_LEFTY:
+				stickLY = sdlEvent.gaxis.value;
+				break;
+			case SDL_GAMEPAD_AXIS_RIGHTX:
+				stickRX = sdlEvent.gaxis.value;
+				break;
+			case SDL_GAMEPAD_AXIS_RIGHTY:
+				stickRY = sdlEvent.gaxis.value;
+				break;
+			default:
+				break;
 			}
 			break;
-		}	
-		
+
+		default:
+			break;
+		}
+
 }
 
 void Scene0::Update(const float deltaTime) {
 
 	audioSystem.Update();
 
-	static float elapsedTime = 0.0f;
-	elapsedTime += deltaTime;
+	// Rotate the selected actor using the left stick (X = yaw, Y = pitch)
+	const float rotationSpeed = 90.0f; // degrees per second at full stick
+	float yawInput = (std::abs(stickLX) > deadzone) ? stickLX / 32768.0f : 0.0f;
+	float pitchInput = (std::abs(stickLY) > deadzone) ? stickLY / 32768.0f : 0.0f;
 
-	//luigisModelMatrix = MMath::translate(2.0f, 0.0f, 0.0f) * MMath::rotate(elapsedTime * 90.0f, Vec3(1.0f, 0.0f, 0.0f));
+	if (yawInput != 0.0f || pitchInput != 0.0f)
+	{
+		Quaternion yaw = QMath::angleAxisRotation(yawInput * rotationSpeed * deltaTime, Vec3(0.0f, 1.0f, 0.0f));
+		Quaternion pitch = QMath::angleAxisRotation(pitchInput * rotationSpeed * deltaTime, Vec3(1.0f, 0.0f, 0.0f));
+		actorLoop[selectedActor]->rotate(yaw * pitch);
+	}
+
+	// Mario spins on his own unless the player has selected him to steer with the stick
+	if (actorLoop[selectedActor] != mario)
+	{
+		mario->rotate(QMath::angleAxisRotation(rotationSpeed * deltaTime, Vec3(0.0f, 1.0f, 0.0f)));
+	}
+
+	// Move the selected actor left/right and up/down using the right stick
+	const float moveSpeed = 3.0f; // units per second at full stick
+	float moveXInput = (std::abs(stickRX) > deadzone) ? stickRX / 32768.0f : 0.0f;
+	float moveYInput = (std::abs(stickRY) > deadzone) ? stickRY / 32768.0f : 0.0f;
+
+	if (moveXInput != 0.0f || moveYInput != 0.0f)
+	{
+		// Stick up reports a negative value, so flip it to move up on screen
+		actorLoop[selectedActor]->translate(Vec3(moveXInput * moveSpeed * deltaTime, -moveYInput * moveSpeed * deltaTime, 0.0f));
+	}
 
 	// Update all actors
 	for (auto& actor : actorLoop)
@@ -272,9 +315,6 @@ void Scene0::Update(const float deltaTime) {
 	{
 		profilerTest = i;
 	}*/
-
-	Matrix4 marioMatrix = MMath::translate(0.0f, -1.0f, 0.0f) * MMath::rotate(elapsedTime * 90.0f, Vec3(0.0f, 1.0f, 0.0f)) * MMath::scale(0.5f, 0.5f, 0.5f);
-	mario->setModelMatrix(marioMatrix);
 }
 
 void Scene0::Render() const {

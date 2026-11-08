@@ -9,7 +9,7 @@ using namespace MATH;
 class Actor
 {
 private:
-	Vec3 pos, vel;
+	Vec3 pos, vel, scale;
 	Quaternion orient;
 
 	Sampler2D texture;
@@ -26,7 +26,7 @@ public:
 	Actor();
 
 	void OnCreate(Vec3 pos_, Vec3 vel_, Quaternion orient_,
-		DescriptorSetInfo descSetInfo_, PipelineInfo pipelineInfo_);
+		DescriptorSetInfo descSetInfo_, PipelineInfo pipelineInfo_, Vec3 scale_ = Vec3(1.0f, 1.0f, 1.0f));
 
 	void OnDestroy(VulkanRenderer* renderer);
 
@@ -40,6 +40,8 @@ public:
 	// Setters
 	void setModelMatrix(Matrix4 matrix_);
 	void setHighlighState(const bool state);
+	void rotate(const Quaternion& deltaOrient);
+	void translate(const Vec3& delta);
 
 	// Getters
 	// Non modifiable (or at least shouldn't be)
