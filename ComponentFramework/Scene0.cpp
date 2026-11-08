@@ -225,12 +225,18 @@ void Scene0::HandleEvents(const SDL_Event& sdlEvent) {
 				actorLoop[selectedActor]->setHighlighState(highlightState);
 				break;
 			case SDL_GAMEPAD_BUTTON_DPAD_RIGHT:
-				actorLoop[selectedActor]->setHighlighState(!highlightState);
+				highlightState = false;
+				actorLoop[selectedActor]->setHighlighState(highlightState);
 				selectedActor = (selectedActor + 1) % actorLoop.size();
+				highlightState = true;
+				actorLoop[selectedActor]->setHighlighState(highlightState);
 				break;
 			case SDL_GAMEPAD_BUTTON_DPAD_LEFT:
-				actorLoop[selectedActor]->setHighlighState(!highlightState);
+				highlightState = false;
+				actorLoop[selectedActor]->setHighlighState(highlightState);
 				selectedActor = (selectedActor - 1 + static_cast<int>(actorLoop.size())) % static_cast<int>(actorLoop.size());
+				highlightState = true;
+				actorLoop[selectedActor]->setHighlighState(highlightState);
 				break;
 			default:
 				break;
