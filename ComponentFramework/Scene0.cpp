@@ -113,6 +113,17 @@ bool Scene0::OnCreate() {
 	case RendererType::OPENGL:
 		break;
 	}
+	int gamepadCount = 0;
+	SDL_JoystickID* gamepadIDs = SDL_GetGamepads(&gamepadCount);
+
+	if (gamepadCount > 0) {
+		gamepad = SDL_OpenGamepad(gamepadIDs[0]);
+		if (!gamepad) {
+			Debug::Error("Failed to open gamepad: ", __FILE__, __LINE__);
+		}
+	}
+	SDL_free(gamepadIDs);
+	
 	return true;
 }
 
@@ -162,6 +173,7 @@ void Scene0::HandleEvents(const SDL_Event& sdlEvent) {
 					break;
 				}
 				dynamic_cast<VulkanRenderer*>(renderer)->UpdateUniformBuffer<LightsData>(lights, lightsUBO); // updates buffer to apply changes
+				break;
 
 			case SDLK_F:
 				if (!audioSystem.isSoundPlaying("flacFile"))
@@ -202,16 +214,28 @@ void Scene0::HandleEvents(const SDL_Event& sdlEvent) {
 			default:
 				break;
 			}
+			break;
 
-			// Gamepad
-			switch (sdlEvent.gbutton.down)
+		// Gamepad
+		case SDL_EVENT_GAMEPAD_BUTTON_DOWN:
+			switch (sdlEvent.gbutton.button)
 			{
+			case SDL_GAMEPAD_BUTTON_DPAD_UP:
+				highlightState ? highlightState = false : highlightState = true;
+				actorLoop[selectedActor]->setHighlighState(highlightState);
+				break;
 			case SDL_GAMEPAD_BUTTON_DPAD_RIGHT:
-				
+				actorLoop[selectedActor]->setHighlighState(!highlightState);
+				selectedActor = (selectedActor + 1) % actorLoop.size();
+				break;
+			case SDL_GAMEPAD_BUTTON_DPAD_LEFT:
+				actorLoop[selectedActor]->setHighlighState(!highlightState);
+				selectedActor = (selectedActor - 1 + static_cast<int>(actorLoop.size())) % static_cast<int>(actorLoop.size());
 				break;
 			default:
 				break;
 			}
+			break;
 
 		default:
 			if (renderer->getRendererType() == RendererType::VULKAN) {
